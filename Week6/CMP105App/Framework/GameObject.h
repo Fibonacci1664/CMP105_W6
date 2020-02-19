@@ -37,6 +37,7 @@ public:
 
 	// Set the input component
 	void setInput(Input* in) { input = in; };
+	void setWindow(sf::RenderWindow* hwnd) { window = hwnd; }
 
 protected:
 	// Sprite properties
@@ -49,4 +50,5 @@ protected:
 
 	// input component
 	Input* input;
+	sf::RenderWindow* window;
 };
