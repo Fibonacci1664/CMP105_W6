@@ -1,4 +1,5 @@
 #include "Ball.h"
+#include "Player.h"
 #include "Framework/Vector.h"
 
 
@@ -6,9 +7,9 @@ Ball::Ball()
 {
 	//setVelocity(sf::Vector2f(0.0f, 400.0f));
 	m_acceleration = 100.0f;			// Is this the equivalent of our 'm_scale' below and simply acts as a scalar?
-	m_direction = sf::Vector2f(0.0f, 5.0f);
+	m_direction = sf::Vector2f(5.0f, 0.0f);
 	
-	m_jumpScalar = 700;
+	m_jumpScalar = 600;
 
 	// Gravitational Accelleration.
 	m_gravityScalar = 100;		// What is the purpose of this, is this so we can still keep the nice 9.8 figure as gravity but then just multiply it by a scalar?
@@ -43,7 +44,8 @@ void Ball::handleInput(float dt)
 void Ball::update(float dt)
 {
 	//move(dt);
-	gravityFall(dt);
+	moveAtoB(dt);
+	//gravityFall(dt);
 }
 
 void Ball::move(float dt)
@@ -103,4 +105,21 @@ void Ball::gravityFall(float dt)
 void Ball::teleportBall(float dt)
 {
 	setPosition(m_mouseX, m_mouseY);
+}
+
+void Ball::moveAtoB(float dt)
+{
+	// My attempt at a chase player solution.
+	/*sf::Vector2f playerPos = Player::getPlayerPos();
+
+	sf::Vector2f delta = playerPos - getPosition();
+	Vector::normalise(delta);
+	velocity = (delta * m_acceleration) * dt;*/
+
+	sf::Vector2f startPoint = sf::Vector2f(getPosition().x, getPosition().y);
+	sf::Vector2f endPoint = sf::Vector2f(window->getSize().x, window->getSize().y);
+	sf::Vector2f delta = endPoint - startPoint;
+	Vector::normalise(delta);
+	velocity = (delta * m_acceleration) * dt;
+	setPosition(getPosition() + (velocity * dt));
 }

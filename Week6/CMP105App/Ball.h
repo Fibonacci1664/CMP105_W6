@@ -18,6 +18,7 @@ private:
 	void gravityFall(float dt);
 	void move(float dt);
 	void teleportBall(float dt);
+	void moveAtoB(float dt);
 
 	int m_mouseX;
 	int m_mouseY;

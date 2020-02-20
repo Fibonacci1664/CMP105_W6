@@ -5,6 +5,7 @@
 #include <string.h>
 #include <iostream>
 #include "Ball.h"
+#include "Player.h"
 
 
 class Level{
@@ -23,6 +24,7 @@ private:
 
 	void loadTextures();
 	void initBalls();
+	void initPlayer();
 
 	// Default variables for level class.
 	sf::RenderWindow* window;
@@ -30,6 +32,8 @@ private:
 
 	// More level variables
 	sf::Texture m_ballTexture;
+	sf::Texture m_marioTexture;
 	Ball m_ball_1;
 	Ball m_ball_2;
+	Player m_player_1;
 };
