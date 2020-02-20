@@ -11,8 +11,6 @@ public:
 	void update(float dt) override;
 	void handleInput(float dt) override;
 
-	/*static sf::Vector2f m_playersPos;
-	static sf::Vector2f getPlayerPos() { return m_playersPos; }*/
 
 protected:
 	Animation run;

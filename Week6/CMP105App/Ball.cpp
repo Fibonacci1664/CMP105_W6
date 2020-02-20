@@ -6,12 +6,14 @@
 Ball::Ball()
 {
 	//setVelocity(sf::Vector2f(0.0f, 400.0f));
-	m_acceleration = 100.0f;			// Is this the equivalent of our 'm_scale' below and simply acts as a scalar?
+
+	// USE THIS TYPE OF ACCELERATION FOR WHEN ANY OTHER TYPE OF ACCEL IS REQ OTHER THAN GRAVITY I.E CARS ETC.
+	m_acceleration = 100.0f;			// Is this the equivalent of our 'm_scale' below and simply acts as a scalar value?
 	m_direction = sf::Vector2f(5.0f, 0.0f);
 	
 	m_jumpScalar = 600;
 
-	// Gravitational Accelleration.
+	// Gravitational Accelleration. USE THIS FOR WHEN GRAVITY IS NEEDED.
 	m_gravityScalar = 100;		// What is the purpose of this, is this so we can still keep the nice 9.8 figure as gravity but then just multiply it by a scalar?
 	m_gravitationalAccel = sf::Vector2f(0, 9.8) * m_gravityScalar;
 
@@ -44,7 +46,8 @@ void Ball::handleInput(float dt)
 void Ball::update(float dt)
 {
 	//move(dt);
-	moveAtoB(dt);
+	//moveAtoB(dt);
+	chaseMouseCursor(dt);
 	//gravityFall(dt);
 }
 
@@ -57,7 +60,7 @@ void Ball::move(float dt)
 	 */
 
 	m_direction = Vector::normalise(m_direction);		/*
-														 * Normalized, thus reducing the y-value of m_direction to 1.0f
+														 * Normalized, thus reducing the y-value of m_direction to a unit vector (NOT NECESSARILY 1)
 														 * so it is no longer 5.0f. This will now need multiplied by some scalar
 														 * value e.g. m_acceleration, to be of any use.
 														 */
@@ -109,17 +112,37 @@ void Ball::teleportBall(float dt)
 
 void Ball::moveAtoB(float dt)
 {
-	// My attempt at a chase player solution.
-	/*sf::Vector2f playerPos = Player::getPlayerPos();
-
-	sf::Vector2f delta = playerPos - getPosition();
-	Vector::normalise(delta);
-	velocity = (delta * m_acceleration) * dt;*/
-
 	sf::Vector2f startPoint = sf::Vector2f(getPosition().x, getPosition().y);
 	sf::Vector2f endPoint = sf::Vector2f(window->getSize().x, window->getSize().y);
 	sf::Vector2f delta = endPoint - startPoint;
-	Vector::normalise(delta);
+	delta = Vector::normalise(delta);
+
+	// Here we are NOT using += as we are NOT accelerating we are simply moving A to B at a constant velocity.
 	velocity = (delta * m_acceleration) * dt;
+	setPosition(getPosition() + velocity);
+}
+
+void Ball::chaseMouseCursor(float dt)
+{
+	m_mouseX = input->getMouseX();
+	m_mouseY = input->getMouseY();
+
+	sf::Vector2f startPoint = sf::Vector2f(getPosition().x, getPosition().y);		// Balls position.
+	sf::Vector2f endPoint = sf::Vector2f(m_mouseX, m_mouseY);						// Mouse cursor position.
+	sf::Vector2f deltaDir = endPoint - startPoint;									// The distance between.
+
+	deltaDir = Vector::normalise(deltaDir);
+
+	velocity += (deltaDir * m_acceleration) * dt;
+
 	setPosition(getPosition() + (velocity * dt));
+
+	sf::Vector2f ballPos = getPosition();
+	sf::Vector2f distanceBetween = endPoint - ballPos;
+	float mag = Vector::magnitude(distanceBetween);
+
+	if (mag < getSize().x / 2.0f || mag < getSize().y / 2.0f)
+	{
+		velocity = sf::Vector2f(0, 0);
+	}
 }

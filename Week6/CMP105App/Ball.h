@@ -19,6 +19,7 @@ private:
 	void move(float dt);
 	void teleportBall(float dt);
 	void moveAtoB(float dt);
+	void chaseMouseCursor(float dt);
 
 	int m_mouseX;
 	int m_mouseY;

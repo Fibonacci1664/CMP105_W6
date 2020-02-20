@@ -26,8 +26,8 @@ void Level::handleInput(float dt)
 // Update game objects
 void Level::update(float dt)
 {
-	m_ball_1.update(dt);
-	//m_ball_2.update(dt);
+	//m_ball_1.update(dt);
+	m_ball_2.update(dt);
 	m_player_1.update(dt);
 }
 
@@ -35,8 +35,8 @@ void Level::update(float dt)
 void Level::render()
 {
 	beginDraw();
-	window->draw(m_ball_1);
-	//window->draw(m_ball_2);
+	//window->draw(m_ball_1);
+	window->draw(m_ball_2);
 	window->draw(m_player_1);
 	endDraw();
 }
