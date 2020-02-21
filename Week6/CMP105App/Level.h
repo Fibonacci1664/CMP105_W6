@@ -6,6 +6,7 @@
 #include <iostream>
 #include "Ball.h"
 #include "Player.h"
+#include "SlingShot.h"
 
 
 class Level{
@@ -25,6 +26,7 @@ private:
 	void loadTextures();
 	void initBalls();
 	void initPlayer();
+	void initSling();
 
 	// Default variables for level class.
 	sf::RenderWindow* window;
@@ -33,7 +35,10 @@ private:
 	// More level variables
 	sf::Texture m_ballTexture;
 	sf::Texture m_marioTexture;
+	sf::Texture m_slingShotTexture;
 	Ball m_ball_1;
 	Ball m_ball_2;
 	Player m_player_1;
+
+	SlingShot m_sling;
 };

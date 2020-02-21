@@ -1,6 +1,4 @@
 #include "SlingShot.h"
-#include "Player.h"
-
 
 SlingShot::SlingShot()
 {
@@ -10,9 +8,9 @@ SlingShot::SlingShot()
 	newMouseY = 0;
 	m_dragDist = 0;
 
-	input->setMouseLDown(false);
 	m_flag = false;
 	m_fireMario = false;
+	loadTextures();
 }
 
 SlingShot::~SlingShot()
@@ -27,12 +25,22 @@ void SlingShot::handleInput(float dt)
 
 void SlingShot::update(float dt)
 {
-	fireMario(dt);
+	
 }
 
-void SlingShot::fireMario(float dt)
+void SlingShot::fireBall(float dt)
 {
-	Player mario;
+	// Instantiate a ball object here.	
+}
+
+void SlingShot::loadTextures()
+{
+	
+}
+
+void SlingShot::initBall()
+{
+
 }
 
 void SlingShot::addFrames()
@@ -48,6 +56,19 @@ void SlingShot::calulateDragDistance()
 		m_flag = true;
 		m_mouseX = input->getMouseX();
 		m_mouseY = input->getMouseY();
+
+		// If we release the left mouse button.
+		if (!input->isMouseLDown())
+		{
+			m_flag = false;
+
+			int deltaX = newMouseX - m_mouseX;
+			int deltaY = newMouseY - m_mouseY;
+
+			m_dragDist = sqrt((deltaX * deltaX) + (deltaY * deltaY));
+
+			m_fireMario = true;
+		}
 	}
 
 	// While we continue to hold down the left mouse button, keep updating the end position.
@@ -55,18 +76,5 @@ void SlingShot::calulateDragDistance()
 	{
 		newMouseX = input->getMouseX();
 		newMouseY = input->getMouseY();
-	}
-
-	// If we release the left mouse button.
-	if (!input->isMouseLDown())
-	{
-		m_flag = false;
-
-		int deltaX = newMouseX - m_mouseX;
-		int deltaY = newMouseY - m_mouseY;
-
-		m_dragDist = sqrt((deltaX * deltaX) + (deltaY * deltaY));
-
-		m_fireMario = true;
-	}
+	}	
 }

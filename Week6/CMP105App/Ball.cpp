@@ -1,3 +1,4 @@
+#include<iostream>
 #include "Ball.h"
 #include "Player.h"
 #include "Framework/Vector.h"
@@ -8,7 +9,7 @@ Ball::Ball()
 	//setVelocity(sf::Vector2f(0.0f, 400.0f));
 
 	// USE THIS TYPE OF ACCELERATION FOR WHEN ANY OTHER TYPE OF ACCEL IS REQ OTHER THAN GRAVITY I.E CARS ETC.
-	m_acceleration = 100.0f;			// Is this the equivalent of our 'm_scale' below and simply acts as a scalar value?
+	m_acceleration = 10.0f;			// Is this the equivalent of our 'm_scale' below and simply acts as a scalar value?
 	m_direction = sf::Vector2f(5.0f, 0.0f);
 	
 	m_jumpScalar = 600;
@@ -19,11 +20,19 @@ Ball::Ball()
 
 	m_mouseX = 0;
 	m_mouseY = 0;
+	m_flag = false;
+	m_mouseX = 0;
+	m_mouseY = 0;
+	newMouseX = 0;
+	newMouseY = 0;
+	m_dragDist = 0;
+
+	m_maxGravAccel = sf::Vector2f(0.0f, 750.0f);
 }
 
 Ball::~Ball()
 {
-
+	std::cout << "Ball object destoryed!\n";
 }
 
 void Ball::handleInput(float dt)
@@ -33,22 +42,22 @@ void Ball::handleInput(float dt)
 		m_stepVelocity = sf::Vector2f(0, -1.0f) * m_jumpScalar;
 	}
 
-	if (input->isMouseLDown())
-	{
-		m_stepVelocity = sf::Vector2f(0, 0);
-		m_mouseX = input->getMouseX();
-		m_mouseY = input->getMouseY();
-		//input->setMouseLDown(false);		// Uncomment this line if you dont wish to drag the ball around.
-		teleportBall(dt);
-	}
+	launch(dt);
+
+	//if (input->isMouseLDown())
+	//{
+	//	//input->setMouseLDown(false);		// Uncomment this line if you dont wish to drag the ball around.	//	m_stepVelocity = sf::Vector2f(0, 0);
+	//	
+	//	//teleportBall(dt);
+	//}
 }
 
 void Ball::update(float dt)
 {
 	//move(dt);
 	//moveAtoB(dt);
-	chaseMouseCursor(dt);
-	//gravityFall(dt);
+	//chaseMouseCursor(dt);
+	gravityFall(dt);
 }
 
 void Ball::move(float dt)
@@ -98,10 +107,20 @@ void Ball::gravityFall(float dt)
 
 	setPosition(getPosition() + displacement);
 
+	/*
+	 * Check to make sure that if we keep spamming the beach ball that its accel doesnt keep increasing forever
+	 * As without this check the only time velocity will be controlled is if the ball strikes the 'ground'.
+	 */
+	if (Vector::magnitude(m_stepVelocity) > Vector::magnitude(m_maxGravAccel))
+	{
+		m_stepVelocity = m_maxGravAccel;
+	}
+
+	// If the ball hits the 'ground', bounce.
 	if ((getPosition().y + getSize().y / 2.0f) > window->getSize().y)
 	{
 		setPosition(getPosition().x, window->getSize().y - getSize().y / 2.0f);
-		m_stepVelocity = sf::Vector2f(0, 0);
+		m_stepVelocity = (-m_stepVelocity) / 1.2f;
 	}
 }
 
@@ -144,5 +163,68 @@ void Ball::chaseMouseCursor(float dt)
 	if (mag < getSize().x / 2.0f || mag < getSize().y / 2.0f)
 	{
 		velocity = sf::Vector2f(0, 0);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
+// NEED HELP FIGURING THIS OUT! THIS IS NOT WORKING AS INTENDED.
+void Ball::launch(float dt)
+{
+	// If we've clicked the left mouse button, set where that happened.
+	if (input->isMouseLDown() && !m_flag)
+	{
+		m_flag = true;
+		mouseStartPoint = sf::Vector2f(input->getMouseX(), input->getMouseY());				// Where we first click.
+	}
+
+	// If we release the left mouse button.
+	if (!input->isMouseLDown() && m_flag)
+	{
+		m_flag = false;
+		mouseEndPoint = sf::Vector2f(input->getMouseX(), input->getMouseY());				// Where we release the left mouse button.
+
+		// We are doing this the opposite way than normal i.e. (end - start) otherwise we end up with neg vel.
+		deltaDir = mouseStartPoint - mouseEndPoint;											// The distance between click and release.
+
+		// PRINT MAG.
+		magnitude = Vector::magnitude(deltaDir);
+		std::cout << "Mag : " << magnitude << '\n';
+
+		//deltaDir = Vector::normalise(deltaDir);								// No point in normalising and then multiplying by mag as this just resluts in the original deltaDir vector.
+		//velocity = (deltaDir * m_acceleration) * dt;
+
+		fired = true;
+	}
+
+	std::cout << "Norm deltaDir X : " << deltaDir.x << " Norm deltaDir Y : " << deltaDir.y << '\n';
+
+	setPosition(getPosition() + (deltaDir * m_acceleration * dt));
+
+	/*
+	 * If we have 'fired' the ball we need to reduce incrementally the delta that is being added to the set position each
+	 * each frame by a fixed amount until such time as the delta becomes less than a threshold amount at which point we
+	 * set the delta to zero and fired to false, meaning that the delta reduction will stop happening until such time as another
+	 * ball is 'fired'.
+	 */
+	if (fired)
+	{
+		deltaDir = deltaDir / 1.1f;						// Reduce delta incrementally.
+
+		if (Vector::magnitude(deltaDir) < 5)			// If delta drops below threshold.
+		{
+			deltaDir = sf::Vector2f(0, 0);				// Set to zero
+			fired = false;
+		}
+	}
+
+	if (getPosition().x + getSize().x / 2.0f > window->getSize().x)
+	{
+		// This is wrong! fix it.
+		//setPosition(getPosition());
 	}
 }

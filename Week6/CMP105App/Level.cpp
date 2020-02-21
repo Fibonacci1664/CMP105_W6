@@ -9,6 +9,7 @@ Level::Level(sf::RenderWindow* hwnd, Input* in)
 	loadTextures();
 	initBalls();
 	initPlayer();
+	initSling();
 }
 
 Level::~Level()
@@ -20,24 +21,28 @@ Level::~Level()
 void Level::handleInput(float dt)
 {
 	m_ball_1.handleInput(dt);
-	m_player_1.handleInput(dt);
+	//m_player_1.handleInput(dt);
+	
+	m_sling.handleInput(dt);
 }
 
 // Update game objects
 void Level::update(float dt)
 {
-	//m_ball_1.update(dt);
-	m_ball_2.update(dt);
-	m_player_1.update(dt);
+	m_ball_1.update(dt);
+	m_sling.update(dt);
+	//m_ball_2.update(dt);
+	//m_player_1.update(dt);
 }
 
 // Render level
 void Level::render()
 {
 	beginDraw();
-	//window->draw(m_ball_1);
-	window->draw(m_ball_2);
-	window->draw(m_player_1);
+	window->draw(m_ball_1);
+	//window->draw(m_ball_2);
+	//window->draw(m_player_1);
+	window->draw(m_sling);
 	endDraw();
 }
 
@@ -57,6 +62,7 @@ void Level::loadTextures()
 {
 	m_ballTexture.loadFromFile("gfx/Beach_Ball.png");
 	m_marioTexture.loadFromFile("gfx/MarioSheetT.png");
+	m_slingShotTexture.loadFromFile("gfx/slingshot.png");
 }
 
 void Level::initBalls()
@@ -64,9 +70,9 @@ void Level::initBalls()
 	m_ball_1.setInput(input);
 	m_ball_1.setWindow(window);
 	m_ball_1.setTexture(&m_ballTexture);
-	m_ball_1.setSize(sf::Vector2f(80, 80));
+	m_ball_1.setSize(sf::Vector2f(25, 25));
 	m_ball_1.setOrigin(sf::Vector2f(m_ball_1.getSize().x / 2.0f, m_ball_1.getSize().y / 2.0f));
-	m_ball_1.setPosition(sf::Vector2f(window->getSize().x / 2, 50));
+	m_ball_1.setPosition(0 + 30, window->getSize().y - 200);
 
 	m_ball_2.setInput(input);
 	m_ball_2.setWindow(window);
@@ -81,7 +87,17 @@ void Level::initPlayer()
 	m_player_1.setInput(input);
 	m_player_1.setWindow(window);
 	m_player_1.setSize(sf::Vector2f(16, 21));				// Max size to accomodate ALL sprites.
-	m_player_1.setPosition(100, 100);
 	m_player_1.setOrigin(sf::Vector2f(m_player_1.getSize().x / 2, m_player_1.getSize().y / 2));
+	m_player_1.setPosition(100, 100);
 	m_player_1.setTexture(&m_marioTexture);
+}
+
+void Level::initSling()
+{
+	m_sling.setInput(input);
+	m_sling.setWindow(window);
+	m_sling.setSize(sf::Vector2f(50, 50));				// Max size to accomodate ALL sprites.
+	m_sling.setOrigin(sf::Vector2f(m_player_1.getSize().x / 2, m_player_1.getSize().y / 2));
+	m_sling.setPosition(0 + 50, window->getSize().y - 30);	
+	m_sling.setTexture(&m_slingShotTexture);
 }
