@@ -21,6 +21,7 @@ private:
 	void moveAtoB(float dt);
 	void chaseMouseCursor(float dt);
 	void launch(float dt);
+	void checkGround();
 
 	bool m_flag;
 

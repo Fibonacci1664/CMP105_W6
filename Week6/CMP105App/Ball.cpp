@@ -58,6 +58,7 @@ void Ball::update(float dt)
 	//moveAtoB(dt);
 	//chaseMouseCursor(dt);
 	gravityFall(dt);
+	checkGround();
 }
 
 void Ball::move(float dt)
@@ -96,6 +97,16 @@ void Ball::move(float dt)
 	}
 }
 
+void Ball::checkGround()
+{
+	// If the ball hits the 'ground', bounce.
+	if ((getPosition().y + getSize().y / 2.0f) > window->getSize().y)
+	{
+		setPosition(getPosition().x, window->getSize().y - getSize().y / 2.0f);
+		m_stepVelocity.y = (-m_stepVelocity.y) / 1.2f;
+	}
+}
+
 void Ball::gravityFall(float dt)
 {
 	// s = ut + 1/2 at^2.
@@ -111,17 +122,17 @@ void Ball::gravityFall(float dt)
 	 * Check to make sure that if we keep spamming the beach ball that its accel doesnt keep increasing forever
 	 * As without this check the only time velocity will be controlled is if the ball strikes the 'ground'.
 	 */
-	if (Vector::magnitude(m_stepVelocity) > Vector::magnitude(m_maxGravAccel))
+	/*if (Vector::magnitude(m_stepVelocity) > Vector::magnitude(m_maxGravAccel))
 	{
 		m_stepVelocity = m_maxGravAccel;
-	}
+	}*/
 
-	// If the ball hits the 'ground', bounce.
-	if ((getPosition().y + getSize().y / 2.0f) > window->getSize().y)
-	{
-		setPosition(getPosition().x, window->getSize().y - getSize().y / 2.0f);
-		m_stepVelocity = (-m_stepVelocity) / 1.2f;
-	}
+	//// If the ball hits the 'ground', bounce.
+	//if ((getPosition().y + getSize().y / 2.0f) > window->getSize().y)
+	//{
+	//	setPosition(getPosition().x, window->getSize().y - getSize().y / 2.0f);
+	//	m_stepVelocity = (-m_stepVelocity) / 1.2f;
+	//}
 }
 
 void Ball::teleportBall(float dt)
@@ -189,7 +200,8 @@ void Ball::launch(float dt)
 		mouseEndPoint = sf::Vector2f(input->getMouseX(), input->getMouseY());				// Where we release the left mouse button.
 
 		// We are doing this the opposite way than normal i.e. (end - start) otherwise we end up with neg vel.
-		deltaDir = mouseStartPoint - mouseEndPoint;											// The distance between click and release.
+		m_stepVelocity = mouseStartPoint - mouseEndPoint;											// The distance between click and release.
+		//deltaDir = deltaDir * 0.1f;
 
 		// PRINT MAG.
 		magnitude = Vector::magnitude(deltaDir);
@@ -203,7 +215,15 @@ void Ball::launch(float dt)
 
 	std::cout << "Norm deltaDir X : " << deltaDir.x << " Norm deltaDir Y : " << deltaDir.y << '\n';
 
-	setPosition(getPosition() + (deltaDir * m_acceleration * dt));
+	//if (fired)
+	//{
+	//	// s = ut + 1/2 at^2.
+	//	//				  s		  =			u		  t   +  1/2			a				 t^2
+	//	sf::Vector2f displacement = (m_stepVelocity * dt) + (0.5f * m_gravitationalAccel * dt * dt);
+
+	//	// v = u + at.		Where in this case deltaDir is both 'v' and 'u'.
+	//	deltaDir = m_gravitationalAccel * dt;
+	//}	
 
 	/*
 	 * If we have 'fired' the ball we need to reduce incrementally the delta that is being added to the set position each
@@ -213,11 +233,13 @@ void Ball::launch(float dt)
 	 */
 	if (fired)
 	{
-		deltaDir = deltaDir / 1.1f;						// Reduce delta incrementally.
+		float friction = 1.002f;
 
-		if (Vector::magnitude(deltaDir) < 5)			// If delta drops below threshold.
+		m_stepVelocity = m_stepVelocity / friction;						// Reduce delta incrementally.
+
+		if (Vector::magnitude(m_stepVelocity) < 5)				// If delta drops below threshold.
 		{
-			deltaDir = sf::Vector2f(0, 0);				// Set to zero
+			m_stepVelocity = sf::Vector2f(0, 0);					// Set to zero
 			fired = false;
 		}
 	}
@@ -225,6 +247,8 @@ void Ball::launch(float dt)
 	if (getPosition().x + getSize().x / 2.0f > window->getSize().x)
 	{
 		// This is wrong! fix it.
-		//setPosition(getPosition());
+		//setPosition(sf::Vector2f((window->getSize().x - getSize().x / 2.0f), window->getPosition().y));
+
+
 	}
 }

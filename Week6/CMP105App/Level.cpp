@@ -30,7 +30,7 @@ void Level::handleInput(float dt)
 void Level::update(float dt)
 {
 	m_ball_1.update(dt);
-	m_sling.update(dt);
+	//m_sling.update(dt);
 	//m_ball_2.update(dt);
 	//m_player_1.update(dt);
 }
@@ -42,7 +42,7 @@ void Level::render()
 	window->draw(m_ball_1);
 	//window->draw(m_ball_2);
 	//window->draw(m_player_1);
-	window->draw(m_sling);
+	//window->draw(m_sling);
 	endDraw();
 }
 
